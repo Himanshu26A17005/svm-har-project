@@ -44,4 +44,48 @@ The new one is called **Human Activity Recognition with Smartphones**. It has 30
 
 The best part is that the people are split: some are for training, some are for testing, and nobody is in both.
 
-### Entry 4: Looking at
+### Entry 4: Looking at the data
+`train.csv` has 7,352 rows and 563 columns (561 features, plus `subject`, plus `Activity`). `test.csv` has 2,947 rows and 563 columns. There were no missing values, so I did not have to clean anything. The six activities were fairly balanced (1,000 to 1,400 rows each in training), so accuracy is a fair score to use.
+
+### Entry 5: Getting X and y ready
+* `X` is the 561 feature columns, which is what the computer looks at.
+* `y` is the `Activity` column, which is the right answer.
+
+I took the `subject` column out of `X`. If the computer could see WHO the person is, it might learn the people instead of the movement. I also took `Activity` out of `X` because that is the answer and it would be cheating!
+
+I did not scale the numbers. Random Forest does not care how big the numbers are, so scaling is not needed.
+
+### Entry 6: Training the model
+A decision tree is like a game of yes/no questions that ends in an answer. A Random Forest grows 100 of these trees, and then they all vote. The answer with the most votes wins. Lots of trees voting makes fewer mistakes than one tree on its own.
+
+In code, there are two lines:
+* `RandomForestClassifier(n_estimators=100, random_state=42)` builds the forest.
+* `model.fit(X_train, y_train)` trains the model. The word "fit" means the computer looks at the training rows and their correct answers and learns the patterns.
+
+### Entry 7: The test!
+I gave the model the numbers from `test.csv` without any answers and asked the model to guess. The test people were never seen during training, making this a fair test. These are the results from running the code:
+
+* **Accuracy:** `0.926` (92.6% correct)
+* **Precision (macro):** `0.9274`
+* **Recall (macro):** `0.9232`
+* **F1-score (macro):** `0.9245`
+
+**What these numbers mean in words:**
+* **Accuracy** tells how many answers were correct out of all answers.
+* **Precision** tells how often the model is correct when it predicts a specific activity (like "walking").
+* **Recall** tells how many of the actual walking rows were found by the model.
+* **F1-score** is one number that balances precision and recall.
+* **Macro** means the model calculated each metric for every activity and then took the average.
+
+### Entry 8: Where did it get confused?
+My confusion matrix is a 6 by 6 table. The rows show the true activity and the columns show what the model guessed. The correct guesses appear on the diagonal.
+
+```text
+Labels order: ['LAYING', 'SITTING', 'STANDING', 'WALKING', 'WALKING_DOWNSTAIRS', 'WALKING_UPSTAIRS']
+
+[[537   0   0   0   0   0]
+ [  0 435  56   0   0   0]
+ [  0  41 491   0   0   0]
+ [  0   0   0 482   6   8]
+ [  0   0   0  15 365  40]
+ [  0   0   0  46   6 419]]
